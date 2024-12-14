@@ -67,15 +67,16 @@ const useStyles = makeStyles({
 });
 
 const Login = (props) => {
-	const dispatch = useDispatch();
+    const dispatch = useDispatch();
 	const classes = useStyles();
 	// const history = useHistory()
 	const [isLoginPage, setIsLoginPage] = useState(true);
 
+
 	const [formValue, setFormValue] = useState({
 		email: "",
 		password: "",
-		name: "",
+        name: "",
 	});
 	const { name, email, password } = formValue;
 
@@ -102,15 +103,15 @@ const Login = (props) => {
 
 					if (!localStorage.getItem("TOKEN_KEY")) {
 						const response = await HttpService.userLogin(formValue);
-						dispatch(setUserDetails(response.data.user));
-						dispatch(saveToken(response.data.token));
+                        dispatch(setUserDetails(response.data.user));
+                        dispatch(saveToken(response.data.token));
 						console.log("response -> ", response);
-						localStorage.setItem("TOKEN_KEY", response.data.token);
-						if (response.data.token) {
-							props.UserLoginHandler(true);
-						} else {
-							props.UserLoginHandler(false);
-						}
+                        localStorage.setItem('TOKEN_KEY', response.data.token);
+                        if(response.data.token){
+                            props.UserLoginHandler(true);
+                        }else{
+                            props.UserLoginHandler(false);
+                        }
 
 						// console.log('response', response)
 
@@ -161,7 +162,7 @@ const Login = (props) => {
 
 						// setAuthToken(response.data.token)
 
-						localStorage.setItem("TOKEN_KEY", response.data.token);
+						localStorage.setItem('TOKEN_KEY', response.data.token);
 
 						// await HttpService.updateUserCacheById(user._id);
 
@@ -211,23 +212,21 @@ const Login = (props) => {
 						// }
 					} else {
 						// props.setUserDetails({})
-						localStorage.clear();
+						localStorage.clear()
 						// props.setSnackInfo('Please logout from other tabs', "error")
 					}
 				} else {
 					console.log("using as register page -> f", email);
-					const response = await HttpService.userRegistration(
-						formValue
-					);
-					dispatch(setUserDetails(response.data.user));
-					dispatch(saveToken(response.data.token));
-					localStorage.setItem("TOKEN_KEY", response.data.token);
-					console.log("response -> ", response);
-					if (response.data.token) {
-						props.UserLoginHandler(true);
-					} else {
-						props.UserLoginHandler(false);
-					}
+                    const response = await HttpService.userRegistration(formValue);
+                    dispatch(setUserDetails(response.data.user));
+                    dispatch(saveToken(response.data.token));
+                    localStorage.setItem('TOKEN_KEY', response.data.token);
+                    console.log("response -> ", response);
+                    if(response.data.token){
+                        props.UserLoginHandler(true);
+                    }else{
+                        props.UserLoginHandler(false);
+                    }
 				}
 			} else {
 				// props.setSnackInfo('Invalid Credentials!', "error")
@@ -280,22 +279,17 @@ const Login = (props) => {
 								style={{ width: "150px", height: "auto" }}
 							/>
 						</div>
-						<h3>
-							User Account{" "}
-							{isLoginPage ? "Login" : "Registration"}
-						</h3>
-						{!isLoginPage && (
-							<input
-								type="name"
-								id="name"
-								value={name}
-								name="name"
-								placeholder="User Name"
-								onChange={onChange}
-								className={classes.input}
-							/>
-						)}
-						<input
+						<h3>User Account {isLoginPage ? "Login" : "Registration"}</h3>
+						{!isLoginPage && <input
+							type="name"
+							id="name"
+							value={name}
+							name="name"
+							placeholder="User Name"
+							onChange={onChange}
+							className={classes.input}
+						/>}
+                        <input
 							type="email"
 							id="email"
 							value={email}
