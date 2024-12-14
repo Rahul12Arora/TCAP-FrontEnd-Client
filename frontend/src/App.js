@@ -34,7 +34,14 @@ function App() {
 				{!isLoggedInUser && (
 					<Login UserLoginHandler={userLoginLogoutHandler} />
 				)}
-				{isLoggedInUser && <SideBar />}
+				{isLoggedInUser && (
+					<Routes>
+						<Route
+							path="/groupChat/*"
+							element={<SideBar />}
+						/>
+					</Routes>
+				)}
 			</div>
 		</Router>
 	);
