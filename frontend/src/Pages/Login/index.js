@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import logo from '../../logo.svg';
+import logo from "../../logo.svg";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
+import { setUserDetails, saveToken } from "../../Redux/Reducer";
 // import { Redirect, Link } from "react-router-dom";
 // import { isLogin, setAuthToken } from '../../utils';
 // import './index.css';
-// import HttpService from '../../services/httpService'
+import HttpService from "../../services/HttpService";
+import { useDispatch } from "react-redux";
 // import { setLoading, setSnackInfo } from '../../redux/actions/appAction';
 // import { connect } from "react-redux";
 // import { setUserDetails } from '../../redux/actions/userAction'
@@ -15,15 +17,16 @@ import Button from "@material-ui/core/Button";
 // import decorpotLogo from '../../assets/img/org'
 
 const useStyles = makeStyles({
-    mainContainer: {
-        display: "flex",
-        justifyContent: "center", /* Centers horizontally */
-        alignItems: "center", /* Centers vertically */
-        height: "100vh", /* Takes full viewport height */
-        textAlign: "center", /* Ensures text and children are centered as well */
-        backgroundColor:" #62636e",
-        animation: "colorChange 10s infinite alternate", /* Apply animation */
-    },
+	mainContainer: {
+		display: "flex",
+		justifyContent: "center" /* Centers horizontally */,
+		alignItems: "center" /* Centers vertically */,
+		height: "100vh" /* Takes full viewport height */,
+		textAlign:
+			"center" /* Ensures text and children are centered as well */,
+		backgroundColor: " #62636e",
+		animation: "colorChange 10s infinite alternate" /* Apply animation */,
+	},
 	container: {
 		display: "flex",
 		flexDirection: "column",
@@ -63,174 +66,200 @@ const useStyles = makeStyles({
 	},
 });
 
-const Login = () => {
+const Login = (props) => {
+    const dispatch = useDispatch();
 	const classes = useStyles();
-    // const history = useHistory()
-    
+	// const history = useHistory()
+	const [isLoginPage, setIsLoginPage] = useState(true);
+
+
 	const [formValue, setFormValue] = useState({
-        email: "",
+		email: "",
 		password: "",
+        name: "",
 	});
-    const { email, password } = formValue;
-    
-    const onChange = (e) => {
-        setFormValue({ ...formValue, [e.target.name]: e.target.value })
-    }
+	const { name, email, password } = formValue;
 
-    const onSubmit = useCallback(async () => {
-        // props.setLoading(true)
-        try {
-            let isEmailValid = email.match(
-                /^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i
-            )
-            if (isEmailValid) {
+	const onChange = (e) => {
+		setFormValue({ ...formValue, [e.target.name]: e.target.value });
+	};
 
-                // console.log('email is', email)
+	const onSubmit = useCallback(async () => {
+		// props.setLoading(true)
+		try {
+			let isEmailValid = email.match(
+				/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i
+			);
+			if (isEmailValid) {
+				console.log("email is", email);
+				if (isLoginPage) {
+					// / props.setLoading(false)
 
-                // props.setLoading(false)
+					console.log("Using as login page", email);
+					// console.log('Password', password);
 
-                console.log('EMAIL_ID', email);
-                console.log('Password', password);
+					// history.push('/changePassword');
+					// return
 
-                // history.push('/changePassword');
-                // return
+					if (!localStorage.getItem("TOKEN_KEY")) {
+						const response = await HttpService.userLogin(formValue);
+                        dispatch(setUserDetails(response.data.user));
+                        dispatch(saveToken(response.data.token));
+						console.log("response -> ", response);
+                        localStorage.setItem('TOKEN_KEY', response.data.token);
+                        if(response.data.token){
+                            props.UserLoginHandler(true);
+                        }else{
+                            props.UserLoginHandler(false);
+                        }
 
-                if (!localStorage.getItem('TOKEN_KEY')) {
+						// console.log('response', response)
 
-                    // const response = await HttpService.login(formValue)
+						// if (response.status == 202) {
 
-                    // console.log('response', response)
+						//     history.push('/changePassword');
 
-                    // if (response.status == 202) {
+						//     // props.setSnackInfo(response.data.message, "warning")
 
-                    //     history.push('/changePassword');
+						//     return
 
-                    //     // props.setSnackInfo(response.data.message, "warning")
+						// }
 
-                    //     return
+						// const cacheUpdateResult = await HttpService.updateUserCacheById(response.data.userDetails._id);
+						//update locally as well
+						// if (cacheUpdateResult.data == 'ok') {
+						//     response.data.userDetails.cacheClearRequired = false;
+						//     console.log('response.data', response.data)
+						// }
 
-                    // }
+						// let user = response.data.userDetails
 
+						// console.log('user', user)
 
-                    // const cacheUpdateResult = await HttpService.updateUserCacheById(response.data.userDetails._id);
-                    //update locally as well
-                    // if (cacheUpdateResult.data == 'ok') {
-                    //     response.data.userDetails.cacheClearRequired = false;
-                    //     console.log('response.data', response.data)
-                    // }
+						// let MyLastPasswordCreationDate = new Date(user.LastPasswordCreationDate)
 
-                    // let user = response.data.userDetails
+						// console.log('MyLastPasswordCreationDate', MyLastPasswordCreationDate)
 
-                    // console.log('user', user)
+						// let CurrentDate = new Date()
 
-                    // let MyLastPasswordCreationDate = new Date(user.LastPasswordCreationDate)
+						// console.log('CurrentDate', CurrentDate)
 
-                    // console.log('MyLastPasswordCreationDate', MyLastPasswordCreationDate)
+						// let timeDifference = CurrentDate.getTime() - MyLastPasswordCreationDate.getTime();
 
-                    // let CurrentDate = new Date()
+						// console.log('timeDifference', timeDifference)
 
-                    // console.log('CurrentDate', CurrentDate)
+						// let DaysRemainingToChangePassword = 90 - (Math.floor(timeDifference / (1000 * 60 * 60 * 24)))
 
-                    // let timeDifference = CurrentDate.getTime() - MyLastPasswordCreationDate.getTime();
+						// console.log('DaysRemainingToChangePassword', DaysRemainingToChangePassword)
 
-                    // console.log('timeDifference', timeDifference)
+						// if (DaysRemainingToChangePassword < 1) {
 
-                    // let DaysRemainingToChangePassword = 90 - (Math.floor(timeDifference / (1000 * 60 * 60 * 24)))
+						//     history.push('/changePassword');
 
-                    // console.log('DaysRemainingToChangePassword', DaysRemainingToChangePassword)
+						//     return
 
-                    // if (DaysRemainingToChangePassword < 1) {
+						// }
 
-                    //     history.push('/changePassword');
+						// setAuthToken(response.data.token)
 
-                    //     return
+						localStorage.setItem('TOKEN_KEY', response.data.token);
 
-                    // }
+						// await HttpService.updateUserCacheById(user._id);
 
-                    // setAuthToken(response.data.token)
+						// if (response.data.userDetails.experienceCenterId.length !== 1) {
 
-                    // localStorage.setItem('TOKEN_KEY', response.data.token)
+						// props.setUserDetails(response.data.userDetails)
 
-                    // await HttpService.updateUserCacheById(user._id);
+						//NEW FLOW
+						// props.setUserDetails({
+						//     ...response.data.userDetails,
+						//     selectedExpCenter: response.data.userDetails.experienceCenterId,
+						//     selectedLocation: response.data.userDetails.locationId.map((el) => el._id)
+						// })
 
-                    // if (response.data.userDetails.experienceCenterId.length !== 1) {
+						// if(response.data.userDetails?.roles[0]['name'] === 'Admin') {
 
-                        // props.setUserDetails(response.data.userDetails)
+						// props.history.push('/select-organisation')
+						// props.history.push('/dashboard')
 
-                        //NEW FLOW
-                        // props.setUserDetails({
-                        //     ...response.data.userDetails,
-                        //     selectedExpCenter: response.data.userDetails.experienceCenterId,
-                        //     selectedLocation: response.data.userDetails.locationId.map((el) => el._id)
-                        // })
+						// } else {
 
-                        // if(response.data.userDetails?.roles[0]['name'] === 'Admin') {
+						// let userDetails = response.data.userDetails
 
-                        // props.history.push('/select-organisation')
-                        // props.history.push('/dashboard')
+						// let MyLastPasswordCreationDate = new Date(userDetails.LastPasswordCreationDate)
 
-                    // } else {
+						// console.log('MyLastPasswordCreationDate', MyLastPasswordCreationDate)
 
-                        // let userDetails = response.data.userDetails
+						// let CurrentDate = new Date()
 
-                        // let MyLastPasswordCreationDate = new Date(userDetails.LastPasswordCreationDate)
+						// console.log('CurrentDate', CurrentDate)
 
-                        // console.log('MyLastPasswordCreationDate', MyLastPasswordCreationDate)
+						// let timeDifference = CurrentDate.getTime() - MyLastPasswordCreationDate.getTime();
 
-                        // let CurrentDate = new Date()
+						// console.log('timeDifference', timeDifference)
 
-                        // console.log('CurrentDate', CurrentDate)
+						// let DaysRemainingToChangePassword = 90 - (Math.floor(timeDifference / (1000 * 60 * 60 * 24)));
 
-                        // let timeDifference = CurrentDate.getTime() - MyLastPasswordCreationDate.getTime();
+						// console.log('differenceInDays', DaysRemainingToChangePassword)
 
-                        // console.log('timeDifference', timeDifference)
+						// props.setUserDetails({
+						//     ...response.data.userDetails,
+						//     selectedExpCenter: response.data.userDetails.experienceCenterId[0],
+						//     selectedLocation: response.data.userDetails.locationId[0]._id,
+						//     DaysRemainingToChangePassword: DaysRemainingToChangePassword
+						// })
+						// props.history.push('/dashboard');
+						// }
+					} else {
+						// props.setUserDetails({})
+						localStorage.clear()
+						// props.setSnackInfo('Please logout from other tabs', "error")
+					}
+				} else {
+					console.log("using as register page -> f", email);
+                    const response = await HttpService.userRegistration(formValue);
+                    dispatch(setUserDetails(response.data.user));
+                    dispatch(saveToken(response.data.token));
+                    localStorage.setItem('TOKEN_KEY', response.data.token);
+                    console.log("response -> ", response);
+                    if(response.data.token){
+                        props.UserLoginHandler(true);
+                    }else{
+                        props.UserLoginHandler(false);
+                    }
+				}
+			} else {
+				// props.setSnackInfo('Invalid Credentials!', "error")
+			}
+		} catch (error) {
+			console.error(error);
+			// props.setSnackInfo(error.response.data.failed, "error")
+		}
+		// props.setLoading(false)
+	});
 
-                        // let DaysRemainingToChangePassword = 90 - (Math.floor(timeDifference / (1000 * 60 * 60 * 24)));
+	const toggleLoginAndRegistration = () => {
+		try {
+			console.log(isLoginPage);
+			setIsLoginPage((state) => !state);
+			setFormValue({ email: "", password: "" });
+		} catch (error) {
+			console.error("Error -> ", error);
+		}
+	};
 
-                        // console.log('differenceInDays', DaysRemainingToChangePassword)
-
-                        // props.setUserDetails({
-                        //     ...response.data.userDetails,
-                        //     selectedExpCenter: response.data.userDetails.experienceCenterId[0],
-                        //     selectedLocation: response.data.userDetails.locationId[0]._id,
-                        //     DaysRemainingToChangePassword: DaysRemainingToChangePassword
-                        // })
-                        // props.history.push('/dashboard');
-                    // }
-
-                } else {
-
-                    // props.setUserDetails({})
-
-                    // localStorage.clear()
-
-                    // props.setSnackInfo('Please logout from other tabs', "error")
-
-                }
-            } else {
-
-                // props.setSnackInfo('Invalid Credentials!', "error")
-
-            }
-        } catch (error) {
-            console.error(error)
-            // props.setSnackInfo(error.response.data.failed, "error")
-        }
-        // props.setLoading(false)
-    })
-
-    useEffect(() => {
-        const listener = event => {
-            if (event.code === "Enter" || event.code === "NumpadEnter") {
-                event.preventDefault();
-                onSubmit()
-            }
-        };
-        document.addEventListener("keydown", listener);
-        return () => {
-            document.removeEventListener("keydown", listener);
-        };
-    }, [formValue, onSubmit]);
+	useEffect(() => {
+		const listener = (event) => {
+			if (event.code === "Enter" || event.code === "NumpadEnter") {
+				event.preventDefault();
+				onSubmit();
+			}
+		};
+		document.addEventListener("keydown", listener);
+		return () => {
+			document.removeEventListener("keydown", listener);
+		};
+	}, [formValue, onSubmit]);
 
 	/*
     if (isLogin()) {
@@ -243,10 +272,24 @@ const Login = () => {
 				<div className={classes.container}>
 					<div className={classes.form}>
 						<div className="test-logo responsive-container">
-                            <img className="test-logo" src={logo} alt="test-logo" style={{ width: '150px', height: 'auto' }} />
-                        </div>
-						<h3>User Account Login</h3>
-						<input
+							<img
+								className="test-logo"
+								src={logo}
+								alt="test-logo"
+								style={{ width: "150px", height: "auto" }}
+							/>
+						</div>
+						<h3>User Account {isLoginPage ? "Login" : "Registration"}</h3>
+						{!isLoginPage && <input
+							type="name"
+							id="name"
+							value={name}
+							name="name"
+							placeholder="User Name"
+							onChange={onChange}
+							className={classes.input}
+						/>}
+                        <input
 							type="email"
 							id="email"
 							value={email}
@@ -269,26 +312,30 @@ const Login = () => {
 							onClick={onSubmit}
 							variant="contained"
 						>
-							Sign in
+							{isLoginPage ? "Sign in" : "Register"}
 						</Button>
-						
-                        {/* <Link to="/" style={{ padding: '10px 0', marginLeft: "10px" }}> */}
-                        <br></br>
-                        <Button>
-                            <span
-                                style={{
-                                    fontSize: 12,
-                                    fontWeight: 200,
-                                    cursor: 'pointer',
-                                    color: "white"
-                                }}
-                            onMouseOver={(e) => { e.target.style.color = 'grey'; }}
-                            onMouseOut={(e) => { e.target.style.color = 'white'; }}
-                            >
-                                <u> Forgot Password?</u>
-                            </span>
-                            </Button>
-                        {/* </Link> */}
+
+						{/* <Link to="/" style={{ padding: '10px 0', marginLeft: "10px" }}> */}
+						<br></br>
+						<Button onClick={toggleLoginAndRegistration}>
+							<span
+								style={{
+									fontSize: 12,
+									fontWeight: 200,
+									cursor: "pointer",
+									color: "white",
+								}}
+								onMouseOver={(e) => {
+									e.target.style.color = "grey";
+								}}
+								onMouseOut={(e) => {
+									e.target.style.color = "white";
+								}}
+							>
+								<u> {isLoginPage ? "Register" : "Login"}</u>
+							</span>
+						</Button>
+						{/* </Link> */}
 					</div>
 				</div>
 			</div>
