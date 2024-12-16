@@ -13,7 +13,7 @@ const store = createSlice({
     reducers: {
         saveToken(state, action) {
             state.token = action.payload;
-            localStorage.setItem("token", action.payload);
+            localStorage.setItem("TOKEN_KEY", action.payload);
         },
         setName(state, action) {
             state.username = action.payload;
@@ -25,7 +25,7 @@ const store = createSlice({
         setUserDetails(state, action) {
             console.log("Loggin User Details ", state, action);
             state.userDetails = action.payload;
-            localStorage.setItem("userDetails", JSON.stringify(action.payload));
+            localStorage.setItem("userDetails", action.payload);
         }
     },
 });

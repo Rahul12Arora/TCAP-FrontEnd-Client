@@ -106,7 +106,7 @@ const Login = (props) => {
                         dispatch(setUserDetails(response.data.user));
                         dispatch(saveToken(response.data.token));
 						console.log("response -> ", response);
-                        localStorage.setItem('TOKEN_KEY', response.data.token);
+                        // localStorage.setItem('TOKEN_KEY', response.data.token);
                         if(response.data.token){
                             props.UserLoginHandler(true);
                         }else{
@@ -220,7 +220,7 @@ const Login = (props) => {
                     const response = await HttpService.userRegistration(formValue);
                     dispatch(setUserDetails(response.data.user));
                     dispatch(saveToken(response.data.token));
-                    localStorage.setItem('TOKEN_KEY', response.data.token);
+                    // localStorage.setItem('TOKEN_KEY', response.data.token);
                     console.log("response -> ", response);
                     if(response.data.token){
                         props.UserLoginHandler(true);

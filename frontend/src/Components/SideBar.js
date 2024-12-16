@@ -45,7 +45,7 @@ import { useSelector } from "react-redux";
 const drawerWidth = 240;
 
 const SideBar = () => {
-    const userDetails = useSelector((state) => JSON.parse(state.userDetails));
+    const userDetails = useSelector((state) => state.userDetails);
     const [chatMessage, setChatMessage] = useState([]);
     const [openNewChatGroupDialog, setOpenNewChatGroupDialog] = useState(false);
     const [activeUsers, setActiveUsers] = useState([]);
