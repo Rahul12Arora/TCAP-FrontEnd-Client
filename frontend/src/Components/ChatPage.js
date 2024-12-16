@@ -60,12 +60,6 @@ const ChatPage = (props) => {
     try {
       const response = await HttpService.getChatGroupDetailsById(id);
       console.log("getChatGroupDetailsById -> ", response.data);
-
-      let tempArray = [];
-      for (let el of response?.data?.users) {
-        tempArray.push(el.email);
-      }
-      setChatMessage(tempArray);
     } catch (error) {
       console.log("Error -> ", error);
     }
