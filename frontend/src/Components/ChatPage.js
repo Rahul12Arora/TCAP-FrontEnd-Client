@@ -9,8 +9,12 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import SendIcon from "@mui/icons-material/Send";
 import { useParams } from "react-router-dom";
 import HttpService from "../services/HttpService";
+import { io } from 'socket.io-client';
+import { useSelector } from "react-redux";
+const socket = io('http://localhost:5003'); // Replace with your backend URL
 
 const ChatPage = (props) => {
+  const userDetails = useSelector((state) => state.userDetails);
   const { id } = useParams();
   const [chatMessage, setChatMessage] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -25,13 +29,31 @@ const ChatPage = (props) => {
 
   // Function send new message to chat
   const sendMessageHandler = () => {
-    const tempArray = [...chatMessage];
-    tempArray.push(newMessage);
+    // If message is empty return from here
     if (newMessage === "") return;
-    setChatMessage(tempArray);
+
     setNewMessage("");
-    console.log(newMessage);
+    if (newMessage.trim()) {
+      // Payload for backend
+      let payload = {
+        msgBody: newMessage,
+        userDetails: userDetails,
+      }
+      socket.emit('message', payload); // Send message to backend
+      setNewMessage(''); // Clear the input field
+    }
   };
+  useEffect(() => {
+    // Listen for incoming messages from backend
+    socket.on('message', (data) => {
+      setChatMessage((prevMessages) => [...prevMessages, data]);
+    });
+
+    // Cleanup listener on component unmount
+    return () => {
+      socket.off('message');
+    };
+  }, []);
 
   // Function to get group Details of specific group using id
   const getChatGroupDetailsById = async () => {
@@ -97,6 +119,7 @@ const ChatPage = (props) => {
 
     // </div>
     <div>
+      {/* 
       <div
         style={{
           height: "calc(100vh - 100px)",
@@ -106,20 +129,20 @@ const ChatPage = (props) => {
       >
         {chatMessage &&
           chatMessage?.map((el, i) => {
-            const isEven = i % 2 === 0;
+            const isSelfUser = el?.userDetails?._id?.toString() === userDetails?._id?.toString();
             const messageStyle = {
-              background: isEven ? "grey" : "lightgreen",
-              color: isEven ? "white" : "black",
-              textAlign: isEven ? "left" : "right",
+              background: isSelfUser ? "lightgreen" : "grey",
+              color: isSelfUser ?  "black" : "white",
+              textAlign: isSelfUser ?  "right" : "left",
               borderRadius: "10px", // Optional: Adds rounded corners to the message bubbles
               maxWidth: "70%", // Optional: Limits the width of the message bubbles
-              alignSelf: isEven ? "flex-start" : "flex-end", // Aligns the messages to the left or right
+              alignSelf: isSelfUser ? "flex-start" : "flex-end", // Aligns the messages to the left or right
               marginBottom: "5px", // Adds spacing between messages
               padding: "8px 12px", // Adds padding inside the message bubbles
             };
             const containerStyle = {
               display: "flex",
-              justifyContent: isEven ? "flex-start" : "flex-end",
+              justifyContent: isSelfUser ? "flex-end" : "flex-start",
             };
             return (
               <div
@@ -128,13 +151,71 @@ const ChatPage = (props) => {
                 ref={i == 0 ? messagesStartRef : messagesMiddleRef}
               >
                 <div style={messageStyle}>
-                  <p style={{ margin: 0 }}>{el}</p>
+                  <p style={{ margin: 0 }}>{el.msgBody}</p>
                 </div>
               </div>
             );
           })}
         <div ref={messagesEndRef} />
       </div>
+      */}
+      <div
+        style={{
+          height: "calc(100vh - 100px)",
+          overflowY: "auto",
+          paddingBottom: "50px",
+        }}
+      >
+        {chatMessage &&
+          chatMessage.map((el, i) => {
+            const isSelfUser =
+              el?.userDetails?._id?.toString() === userDetails?._id?.toString();
+            const messageStyle = {
+              background: isSelfUser ? "lightgreen" : "grey",
+              color: isSelfUser ? "black" : "white",
+              textAlign: "left",
+              borderRadius: "10px",
+              maxWidth: "70%",
+              alignSelf: isSelfUser ? "flex-end" : "flex-start",
+              marginBottom: "5px",
+              padding: "8px 12px",
+            };
+            const containerStyle = {
+              display: "flex",
+              flexDirection: "column",
+              alignItems: isSelfUser ? "flex-end" : "flex-start",
+            };
+            const showUsername =
+              i === 0 || // Always show for the first message
+              el?.userDetails?._id?.toString() !==
+              chatMessage[i - 1]?.userDetails?._id?.toString();
+
+            return (
+              <div
+                key={i}
+                style={containerStyle}
+                ref={i === 0 ? messagesStartRef : messagesMiddleRef}
+              >
+                {showUsername && (
+                  <p
+                    style={{
+                      margin: "0 0 5px 0",
+                      fontWeight: "bold",
+                      color: isSelfUser ? "lightgreen" : "grey",
+                    }}
+                  >
+                    {isSelfUser ? "You" : el?.userDetails?.name || "Unknown User"}
+                  </p>
+                )}
+                <div style={messageStyle}>
+                  <p style={{ margin: 0 }}>{el.msgBody}</p>
+                </div>
+              </div>
+            );
+          })}
+        <div ref={messagesEndRef} />
+      </div>
+
 
       <div
         style={{
