@@ -44,7 +44,7 @@ import { useSelector } from "react-redux";
 
 const drawerWidth = 240;
 
-const SideBar = () => {
+const SideBar = (props) => {
     const userDetails = useSelector((state) => state.userDetails);
     const [chatMessage, setChatMessage] = useState([]);
     const [openNewChatGroupDialog, setOpenNewChatGroupDialog] = useState(false);
@@ -73,8 +73,9 @@ const SideBar = () => {
     // Function to Logout
     const logOutHandler = () => {
         dispatch(setUserDetails(null));
-        localStorage.clear()
-        // navigate("/");
+        localStorage.clear();
+        props.UserLoginHandler(false);
+        navigate("/");
     };
 
     // function to create new Group

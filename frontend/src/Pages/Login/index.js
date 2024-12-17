@@ -8,6 +8,7 @@ import { setUserDetails, saveToken } from "../../Redux/Reducer";
 // import './index.css';
 import HttpService from "../../services/HttpService";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
 // import { setLoading, setSnackInfo } from '../../redux/actions/appAction';
 // import { connect } from "react-redux";
 // import { setUserDetails } from '../../redux/actions/userAction'
@@ -71,6 +72,7 @@ const Login = (props) => {
 	const classes = useStyles();
 	// const history = useHistory()
 	const [isLoginPage, setIsLoginPage] = useState(true);
+    const navigate = useNavigate();
 
 
 	const [formValue, setFormValue] = useState({
@@ -109,6 +111,7 @@ const Login = (props) => {
                         // localStorage.setItem('TOKEN_KEY', response.data.token);
                         if(response.data.token){
                             props.UserLoginHandler(true);
+                            navigate("/groupChat");
                         }else{
                             props.UserLoginHandler(false);
                         }
@@ -224,6 +227,7 @@ const Login = (props) => {
                     console.log("response -> ", response);
                     if(response.data.token){
                         props.UserLoginHandler(true);
+                        navigate("/groupChat");
                     }else{
                         props.UserLoginHandler(false);
                     }
