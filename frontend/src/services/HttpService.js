@@ -26,6 +26,9 @@ const HttpService = {
     createNewChatGroup: function (data) {
         return axios.post(`${QTurl}chat-group/createNewChatGroup`, data);
     },
+    addNewMemberToGroup: function (payload) {
+        return axios.post(`${QTurl}chat-group/add-new-member-to-group`, payload);
+    },
     getAllChatGroup: function (data) {
         return axios.get(`${QTurl}chat-group/getAllChatGroup`, data);
     },

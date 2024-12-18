@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import Login from "./Pages/Login";
 import SideBar from "./Components/SideBar";
@@ -7,7 +6,6 @@ import {
 	BrowserRouter as Router,
 	Routes,
 	Route,
-	Navigate,
 } from "react-router-dom";
 
 function App() {
@@ -35,9 +33,18 @@ function App() {
 					<Login UserLoginHandler={userLoginLogoutHandler} />
 				)}
 				{/* {isLoggedInUser && <SideBar />} */}
-        <Routes>
-          { isLoggedInUser && <Route path="/groupChat/*" element={<SideBar UserLoginHandler={userLoginLogoutHandler}/>} />}
-        </Routes>
+				<Routes>
+					{isLoggedInUser && (
+						<Route
+							path="/groupChat/*"
+							element={
+								<SideBar
+									UserLoginHandler={userLoginLogoutHandler}
+								/>
+							}
+						/>
+					)}
+				</Routes>
 			</div>
 		</Router>
 	);
