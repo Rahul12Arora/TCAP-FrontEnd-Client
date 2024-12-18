@@ -3,19 +3,9 @@ import logo from "../../logo.svg";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import { setUserDetails, saveToken } from "../../Redux/Reducer";
-// import { Redirect, Link } from "react-router-dom";
-// import { isLogin, setAuthToken } from '../../utils';
-// import './index.css';
 import HttpService from "../../services/HttpService";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
-// import { setLoading, setSnackInfo } from '../../redux/actions/appAction';
-// import { connect } from "react-redux";
-// import { setUserDetails } from '../../redux/actions/userAction'
-// import { useHistory } from 'react-router-dom';
-
-// import decorpotLogo from '../../assets/img/org/latestDecorpot.png'
-// import decorpotLogo from '../../assets/img/org'
 
 const useStyles = makeStyles({
 	mainContainer: {
@@ -68,17 +58,15 @@ const useStyles = makeStyles({
 });
 
 const Login = (props) => {
-    const dispatch = useDispatch();
+	const dispatch = useDispatch();
 	const classes = useStyles();
-	// const history = useHistory()
 	const [isLoginPage, setIsLoginPage] = useState(true);
-    const navigate = useNavigate();
-
+	const navigate = useNavigate();
 
 	const [formValue, setFormValue] = useState({
 		email: "",
 		password: "",
-        name: "",
+		name: "",
 	});
 	const { name, email, password } = formValue;
 
@@ -93,144 +81,33 @@ const Login = (props) => {
 				/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i
 			);
 			if (isEmailValid) {
-				console.log("email is", email);
 				if (isLoginPage) {
-					// / props.setLoading(false)
-
-					console.log("Using as login page", email);
-					// console.log('Password', password);
-
-					// history.push('/changePassword');
-					// return
-
 					if (!localStorage.getItem("TOKEN_KEY")) {
 						const response = await HttpService.userLogin(formValue);
-                        dispatch(setUserDetails(response.data.user));
-                        dispatch(saveToken(response.data.token));
-						console.log("response -> ", response);
-                        // localStorage.setItem('TOKEN_KEY', response.data.token);
-                        if(response.data.token){
-                            props.UserLoginHandler(true);
-                            navigate("/groupChat");
-                        }else{
-                            props.UserLoginHandler(false);
-                        }
-
-						// console.log('response', response)
-
-						// if (response.status == 202) {
-
-						//     history.push('/changePassword');
-
-						//     // props.setSnackInfo(response.data.message, "warning")
-
-						//     return
-
-						// }
-
-						// const cacheUpdateResult = await HttpService.updateUserCacheById(response.data.userDetails._id);
-						//update locally as well
-						// if (cacheUpdateResult.data == 'ok') {
-						//     response.data.userDetails.cacheClearRequired = false;
-						//     console.log('response.data', response.data)
-						// }
-
-						// let user = response.data.userDetails
-
-						// console.log('user', user)
-
-						// let MyLastPasswordCreationDate = new Date(user.LastPasswordCreationDate)
-
-						// console.log('MyLastPasswordCreationDate', MyLastPasswordCreationDate)
-
-						// let CurrentDate = new Date()
-
-						// console.log('CurrentDate', CurrentDate)
-
-						// let timeDifference = CurrentDate.getTime() - MyLastPasswordCreationDate.getTime();
-
-						// console.log('timeDifference', timeDifference)
-
-						// let DaysRemainingToChangePassword = 90 - (Math.floor(timeDifference / (1000 * 60 * 60 * 24)))
-
-						// console.log('DaysRemainingToChangePassword', DaysRemainingToChangePassword)
-
-						// if (DaysRemainingToChangePassword < 1) {
-
-						//     history.push('/changePassword');
-
-						//     return
-
-						// }
-
-						// setAuthToken(response.data.token)
-
-						localStorage.setItem('TOKEN_KEY', response.data.token);
-
-						// await HttpService.updateUserCacheById(user._id);
-
-						// if (response.data.userDetails.experienceCenterId.length !== 1) {
-
-						// props.setUserDetails(response.data.userDetails)
-
-						//NEW FLOW
-						// props.setUserDetails({
-						//     ...response.data.userDetails,
-						//     selectedExpCenter: response.data.userDetails.experienceCenterId,
-						//     selectedLocation: response.data.userDetails.locationId.map((el) => el._id)
-						// })
-
-						// if(response.data.userDetails?.roles[0]['name'] === 'Admin') {
-
-						// props.history.push('/select-organisation')
-						// props.history.push('/dashboard')
-
-						// } else {
-
-						// let userDetails = response.data.userDetails
-
-						// let MyLastPasswordCreationDate = new Date(userDetails.LastPasswordCreationDate)
-
-						// console.log('MyLastPasswordCreationDate', MyLastPasswordCreationDate)
-
-						// let CurrentDate = new Date()
-
-						// console.log('CurrentDate', CurrentDate)
-
-						// let timeDifference = CurrentDate.getTime() - MyLastPasswordCreationDate.getTime();
-
-						// console.log('timeDifference', timeDifference)
-
-						// let DaysRemainingToChangePassword = 90 - (Math.floor(timeDifference / (1000 * 60 * 60 * 24)));
-
-						// console.log('differenceInDays', DaysRemainingToChangePassword)
-
-						// props.setUserDetails({
-						//     ...response.data.userDetails,
-						//     selectedExpCenter: response.data.userDetails.experienceCenterId[0],
-						//     selectedLocation: response.data.userDetails.locationId[0]._id,
-						//     DaysRemainingToChangePassword: DaysRemainingToChangePassword
-						// })
-						// props.history.push('/dashboard');
-						// }
+						dispatch(setUserDetails(response.data.user));
+						dispatch(saveToken(response.data.token));
+						if (response.data.token) {
+							props.UserLoginHandler(true);
+							navigate("/groupChat");
+						} else {
+							props.UserLoginHandler(false);
+						}
+						localStorage.setItem("TOKEN_KEY", response.data.token);
 					} else {
-						// props.setUserDetails({})
-						localStorage.clear()
-						// props.setSnackInfo('Please logout from other tabs', "error")
+						localStorage.clear();
 					}
 				} else {
-					console.log("using as register page -> f", email);
-                    const response = await HttpService.userRegistration(formValue);
-                    dispatch(setUserDetails(response.data.user));
-                    dispatch(saveToken(response.data.token));
-                    // localStorage.setItem('TOKEN_KEY', response.data.token);
-                    console.log("response -> ", response);
-                    if(response.data.token){
-                        props.UserLoginHandler(true);
-                        navigate("/groupChat");
-                    }else{
-                        props.UserLoginHandler(false);
-                    }
+					const response = await HttpService.userRegistration(
+						formValue
+					);
+					dispatch(setUserDetails(response.data.user));
+					dispatch(saveToken(response.data.token));
+					if (response.data.token) {
+						props.UserLoginHandler(true);
+						navigate("/groupChat");
+					} else {
+						props.UserLoginHandler(false);
+					}
 				}
 			} else {
 				// props.setSnackInfo('Invalid Credentials!', "error")
@@ -244,7 +121,6 @@ const Login = (props) => {
 
 	const toggleLoginAndRegistration = () => {
 		try {
-			console.log(isLoginPage);
 			setIsLoginPage((state) => !state);
 			setFormValue({ email: "", password: "" });
 		} catch (error) {
@@ -265,11 +141,6 @@ const Login = (props) => {
 		};
 	}, [formValue, onSubmit]);
 
-	/*
-    if (isLogin()) {
-        return (<Redirect to="/dashboard" />)
-    }
-    */
 	return (
 		<div>
 			<div className={classes.mainContainer}>
@@ -283,17 +154,22 @@ const Login = (props) => {
 								style={{ width: "150px", height: "auto" }}
 							/>
 						</div>
-						<h3>User Account {isLoginPage ? "Login" : "Registration"}</h3>
-						{!isLoginPage && <input
-							type="name"
-							id="name"
-							value={name}
-							name="name"
-							placeholder="User Name"
-							onChange={onChange}
-							className={classes.input}
-						/>}
-                        <input
+						<h3>
+							User Account{" "}
+							{isLoginPage ? "Login" : "Registration"}
+						</h3>
+						{!isLoginPage && (
+							<input
+								type="name"
+								id="name"
+								value={name}
+								name="name"
+								placeholder="User Name"
+								onChange={onChange}
+								className={classes.input}
+							/>
+						)}
+						<input
 							type="email"
 							id="email"
 							value={email}
@@ -319,7 +195,6 @@ const Login = (props) => {
 							{isLoginPage ? "Sign in" : "Register"}
 						</Button>
 
-						{/* <Link to="/" style={{ padding: '10px 0', marginLeft: "10px" }}> */}
 						<br></br>
 						<Button onClick={toggleLoginAndRegistration}>
 							<span
@@ -339,7 +214,6 @@ const Login = (props) => {
 								<u> {isLoginPage ? "Register" : "Login"}</u>
 							</span>
 						</Button>
-						{/* </Link> */}
 					</div>
 				</div>
 			</div>
