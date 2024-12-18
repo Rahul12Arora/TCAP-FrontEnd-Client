@@ -41,6 +41,11 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Autocomplete from "@mui/material/Autocomplete";
 import HttpService from "../services/HttpService";
 import { useSelector } from "react-redux";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import GroupIcon from '@mui/icons-material/Group';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import {IconButton } from '@mui/material';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { io } from 'socket.io-client';
 const socket = io('http://localhost:8080'); // Replace with your backend URL
 
@@ -161,6 +166,28 @@ const SideBar = (props) => {
             console.log("Error -> ", error);
         }
     };
+    
+    
+    // Function to view all group members
+    const viewGroupMembersHandler = async (userId) => {
+        try {
+            console.log("viewGroupMembersHandler -> ");
+        } catch (error) {
+            console.log("Error -> ", error);
+        }
+    };
+
+    // Function to add new Group members
+    const addGroupMembersHandler = async () => {
+        try {
+            console.log("addGroupMembersHandler -> ", groupName);
+            // let users = groupName.users.map((user) => user._id);
+            // setNewGroupUsers(users);
+            setOpenNewChatGroupDialog(true);
+        } catch (error) {
+            console.log("Error -> ", error);
+        }
+    };
 
     useEffect(() => {
         // console.log("Side bar mounted")
@@ -186,18 +213,37 @@ const SideBar = (props) => {
                     }}
                 >
                     <Toolbar>
-                        <Typography variant="h6" noWrap component="div">
+                        {/* Group Name */}
+                        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                             {groupName.groupName}
                         </Typography>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            style={{ marginLeft: "10px" }}
-                            onClick={logOutHandler}
-                        >
-                            LogOut
-                        </Button>
+
+                        {/* Right-side Buttons */}
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <IconButton
+                                color="inherit"
+                                onClick={viewGroupMembersHandler} // Add your handler function
+                                title="View Group Members"
+                            >
+                                <GroupIcon />
+                            </IconButton>
+
+                            <IconButton
+                                color="inherit"
+                                onClick={addGroupMembersHandler} // Add your handler function
+                                title="Add Group Members"
+                            >
+                                <PersonAddIcon />
+                            </IconButton>
+
+                            <IconButton
+                                color="inherit"
+                                onClick={logOutHandler} // Add your handler function
+                                title="Log Out"
+                            >
+                                <LogoutIcon />
+                            </IconButton>
+                        </Box>
                     </Toolbar>
                 </AppBar>
                 <Drawer
@@ -220,10 +266,11 @@ const SideBar = (props) => {
                             key="new-chat-group"
                             disablePadding
                             onClick={(event) => handleClickOpenNewChatGroupDialog()}
+                            sx={{ textDecoration: "none", color: "inherit" }} // Add this line
                         >
                             <ListItemButton>
                                 <ListItemIcon>
-                                    <CreateIcon />
+                                    <PersonAddIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={"Create New Group"} />
                             </ListItemButton>
@@ -233,14 +280,14 @@ const SideBar = (props) => {
                                 <ListItem
                                     component={Link}
                                     to={`/groupChat/${el._id.toString()}`}
-                                    key={index}
+                                    key={index+el.groupName}
                                     disablePadding
                                     onClick={(event) => groupNameChangeHandler(event, el)}
-                                    sx={{ textDecoration: "none", color: "inherit" }} // Add this line
+                                    sx={{ textDecoration: `${groupName?._id?.toString() === el?._id?.toString() ? "" : "none"}`, color: `${groupName?._id?.toString() === el?._id?.toString() ? "" : "inherit"}` }} // Add this line
                                 >
                                     <ListItemButton>
                                         <ListItemIcon>
-                                            {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                            {index % 2 === 0 ? <GroupIcon /> : <PeopleAltIcon />}
                                         </ListItemIcon>
                                         <ListItemText primary={el.groupName} />
                                     </ListItemButton>
