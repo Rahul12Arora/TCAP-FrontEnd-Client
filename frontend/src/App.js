@@ -36,7 +36,7 @@ function App() {
 				)}
 				{/* {isLoggedInUser && <SideBar />} */}
         <Routes>
-          { isLoggedInUser && <Route path="/groupChat/*" element={<SideBar />} />}
+          { isLoggedInUser && <Route path="/groupChat/*" element={<SideBar UserLoginHandler={userLoginLogoutHandler}/>} />}
         </Routes>
 			</div>
 		</Router>

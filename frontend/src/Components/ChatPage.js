@@ -11,7 +11,7 @@ import { useParams } from "react-router-dom";
 import HttpService from "../services/HttpService";
 import { io } from 'socket.io-client';
 import { useSelector } from "react-redux";
-const socket = io('http://localhost:5003'); // Replace with your backend URL
+const socket = io('http://localhost:8080'); // Replace with your backend URL
 
 const ChatPage = (props) => {
   const userDetails = useSelector((state) => state.userDetails);
@@ -39,14 +39,36 @@ const ChatPage = (props) => {
         msgBody: newMessage,
         userDetails: userDetails,
       }
-      socket.emit('message', payload); // Send message to backend
-      setNewMessage(''); // Clear the input field
+      let room = props.ROOM_ID;
+      if (newMessage && room) {
+        // console.log("Room and msg -> ", room, payload.msgBody);
+        // socket.emit('JoinRoom', props.ROOM_ID); // Send room name
+        socket.emit('message', { room, payload }); // Send a message to the room
+        setNewMessage(''); // Clear the message input
+      }
     }
   };
   useEffect(() => {
     // Listen for incoming messages from backend
-    socket.on('message', (data) => {
+    // socket.on('message', (data, callback) => {
+    //   console.log("Message from backend -> ", data);
+    //   setChatMessage((prevMessages) => [...prevMessages, data]);
+    //   // Acknowledge message receipt by calling the callback
+    //   callback('Message received successfully');
+    // });
+    // socket.emit('JoinRoom', props.ROOM_ID); // Send room name
+
+    // Listen for incoming messages from the backend
+    socket.on('message', (data, callback) => {
+      console.log("Message received from backend --> ", data);
+
+      // Append the received message to your chat state
       setChatMessage((prevMessages) => [...prevMessages, data]);
+
+      // Acknowledge message receipt by calling the callback
+      if (callback) {
+        callback('Message received successfully');
+      }
     });
 
     // Cleanup listener on component unmount
@@ -59,15 +81,15 @@ const ChatPage = (props) => {
   const getChatGroupDetailsById = async () => {
     try {
       const response = await HttpService.getChatGroupDetailsById(id);
-      console.log("getChatGroupDetailsById -> ", response.data);
+      // console.log("getChatGroupDetailsById -> ", response.data);
     } catch (error) {
-      console.log("Error -> ", error);
+      console.error("Error -> ", error);
     }
   };
 
   useEffect(() => {
     getChatGroupDetailsById();
-    console.log("Mounting chat Page", id);
+    // console.log("Mounting chat Page", id);
   }, [props]);
 
   useEffect(() => {
