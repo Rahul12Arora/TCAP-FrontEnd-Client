@@ -41,6 +41,8 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Autocomplete from "@mui/material/Autocomplete";
 import HttpService from "../services/HttpService";
 import { useSelector } from "react-redux";
+import { io } from 'socket.io-client';
+const socket = io('http://localhost:8080'); // Replace with your backend URL
 
 const drawerWidth = 240;
 
@@ -55,11 +57,24 @@ const SideBar = (props) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [groupName, setGroupName] = useState("Text");
+    const [room, setRoom] = useState('');
     // console.log("user Details -> ", userDetails);
 
     // Function to handle the chat of a group
     const groupNameChangeHandler = (event, el) => {
-        setGroupName(el.groupName);
+        console.log("New Group -> ", el.groupName);
+        console.log("old Group -> ", groupName.groupName);
+        if (el) {
+            setRoom(el._id);
+            let payload = {
+                roomName: el.groupName,
+                roomId: el._id,
+                oldRoomId: groupName._id,
+                userName : userDetails.name,
+            }
+            socket.emit('JoinRoom', payload); // Join the specified room
+        }
+        setGroupName(el);
         // console.log("Text", el.groupName);
         let tempArray = [];
         for (let i = 0; i < 20; i++) {
@@ -90,14 +105,14 @@ const SideBar = (props) => {
             let obj = { groupName: newGroupName, createdBy: userDetails._id };
             obj.users = newGroupUsers.map((user) => user._id);
             const response = await HttpService.createNewChatGroup(obj);
-            console.log("New Group Name -> ", response);
-            console.log("New Group Members -> ", newGroupUsers);
+            // console.log("New Group Name -> ", response);
+            // console.log("New Group Members -> ", newGroupUsers);
             setNewGroupName("");
             setNewGroupUsers([]);
             getAllChatGroups();
             setOpenNewChatGroupDialog(false);
         } catch (error) {
-            console.log("Error -> ", error);
+            console.error("Error -> ", error);
         }
     };
 
@@ -105,11 +120,11 @@ const SideBar = (props) => {
     const handleClickOpenNewChatGroupDialog = async () => {
         try {
             const response = await HttpService.getAllUser();
-            console.log("Response -> ", response);
+            // console.log("Response -> ", response);
             setActiveUsers(response.data);
             setOpenNewChatGroupDialog(true);
         } catch (error) {
-            console.log("Error -> ", error);
+            console.error("Error -> ", error);
         }
     };
 
@@ -127,11 +142,11 @@ const SideBar = (props) => {
     const getAllChatGroupOfAUser = async (userId) => {
         try {
             const response = await HttpService.getAllChatGroupOfAUser(userId);
-            console.log("All Chat Group 1 -> ", response.data);
+            // console.log("All Chat Group 1 -> ", response.data);
             setGroupName(response.data.chatGroups[0].groupName);
             setGroupNameArray(response.data.chatGroups);
         } catch (error) {
-            console.log("Error -> ", error);
+            console.error("Error -> ", error);
         }
     }
 
@@ -148,9 +163,15 @@ const SideBar = (props) => {
     };
 
     useEffect(() => {
-        console.log("Side bar mounted")
+        // console.log("Side bar mounted")
         getAllChatGroupOfAUser(userDetails._id);
-        console.log(" -> ", userDetails)
+        // console.log(" -> ", userDetails)
+        socket.on('RoomJoined', (data) => {
+            console.log("Message from backend -> ", data);
+            // setChatMessage((prevMessages) => [...prevMessages, data]);
+            // Acknowledge message receipt by calling the callback
+            // callback('Message received successfully');
+        });
     }, []);
 
     return (
@@ -166,7 +187,7 @@ const SideBar = (props) => {
                 >
                     <Toolbar>
                         <Typography variant="h6" noWrap component="div">
-                            {groupName}
+                            {groupName.groupName}
                         </Typography>
                         <Button
                             type="submit"
@@ -234,7 +255,7 @@ const SideBar = (props) => {
                 >
                     <Toolbar />
                     <Routes>
-                        <Route path="/:id" element={<ChatPage MSG_ARR={chatMessage} />} />
+                        <Route path="/:id" element={<ChatPage MSG_ARR={chatMessage} ROOM_ID={room} />} />
                     </Routes>
                 </Box>
             </Box>
