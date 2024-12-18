@@ -167,6 +167,7 @@ const SideBar = (props) => {
         }
     };
     
+    
     // Function to view all group members
     const viewGroupMembersHandler = async (userId) => {
         try {
