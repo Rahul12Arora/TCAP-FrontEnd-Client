@@ -9,7 +9,8 @@ import { useParams } from "react-router-dom";
 import HttpService from "../services/HttpService";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
-const socket = io("http://localhost:8080"); // Replace with your backend URL
+import config from "../Config";
+const socket = io(config.apiUrl); // Replace with your backend URL
 
 const ChatPage = (props) => {
 	const userDetails = useSelector((state) => state.userDetails);
