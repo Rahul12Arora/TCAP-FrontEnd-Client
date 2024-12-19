@@ -40,7 +40,8 @@ import { IconButton } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Slide from "@mui/material/Slide";
 import { io } from "socket.io-client";
-const socket = io("http://localhost:8080"); // Replace with your backend URL
+import config from "../Config";
+const socket = io(config.apiUrl); // Replace with your backend URL
 
 const Transition = React.forwardRef(function Transition(props, ref) {
 	return (

@@ -1,8 +1,6 @@
 import axios from 'axios';
-// import Config from '../config'
-// const Apiurl = Config.apiUrl
-// const QTurl = Config.qtUrl
-const QTurl = "http://localhost:8080/"
+import config from '../Config';
+const QTurl = config.apiUrl;
 
 const HttpService = {
     /**
