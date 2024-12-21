@@ -1,8 +1,9 @@
 import { io } from "socket.io-client";
+import config from "../Config/index";
 
-export const dmChatSocket = io('/dmchat', { autoConnect: false });
-export const groupChatSocket = io('/groupChat', { autoConnect: false });
-export const notificationSocket = io('/notification', { autoConnect: false });
+export const dmChatSocket = io(`${config.apiUrl}/dmchat`, { autoConnect: true });
+export const groupChatSocket = io(`${config.apiUrl}groupChat`, { autoConnect: true });
+export const notificationSocket = io(`${config.apiUrl}/notification`, { autoConnect: true });
 
 // // plain object
 // const socket = io({

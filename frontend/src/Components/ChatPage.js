@@ -9,8 +9,7 @@ import { useParams } from "react-router-dom";
 import HttpService from "../services/HttpService";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
-import config from "../Config";
-const socket = io(config.apiUrl); // Replace with your backend URL
+import { groupChatSocket } from "../Config/socketConfig";
 
 const ChatPage = (props) => {
 	const userDetails = useSelector((state) => state.userDetails);
@@ -37,12 +36,14 @@ const ChatPage = (props) => {
 			let payload = {
 				msgBody: newMessage,
 				userDetails: userDetails,
+				roomId: props.ROOM_ID,
 			};
 			let room = props.ROOM_ID;
 			if (newMessage && room) {
-				// console.log("Room and msg -> ", room, payload.msgBody);
+				console.log("Room and msg -> ", room, payload.msgBody);
 				// socket.emit('JoinRoom', props.ROOM_ID); // Send room name
-				socket.emit("message", { room, payload }); // Send a message to the room
+				groupChatSocket.emit("message", payload);
+				// socket.emit("message", { room, payload }); // Send a message to the room
 				setNewMessage(""); // Clear the message input
 			}
 		}
@@ -58,7 +59,7 @@ const ChatPage = (props) => {
 		// socket.emit('JoinRoom', props.ROOM_ID); // Send room name
 
 		// Listen for incoming messages from the backend
-		socket.on("message", (data, callback) => {
+		groupChatSocket.on("message", (data, callback) => {
 			console.log("Message received from backend --> ", data);
 
 			// Append the received message to your chat state
@@ -72,7 +73,7 @@ const ChatPage = (props) => {
 
 		// Cleanup listener on component unmount
 		return () => {
-			socket.off("message");
+			groupChatSocket.off("message");
 		};
 	}, []);
 
@@ -80,7 +81,7 @@ const ChatPage = (props) => {
 	const getChatGroupDetailsById = async (id) => {
 		try {
 			const response = await HttpService.getChatGroupDetailsById(id);
-      console.log("response -> ", response);
+    //   console.log("response -> ", response);
 		} catch (error) {
 			console.error("Error -> ", error);
 		}

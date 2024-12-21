@@ -1,5 +1,5 @@
 const dev = {
-    apiUrl: "http://localhost:5003/",
+    apiUrl: "http://localhost:8080/",
 }
 let config = dev;
 export default config;

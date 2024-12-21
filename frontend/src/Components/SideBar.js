@@ -39,9 +39,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { IconButton } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Slide from "@mui/material/Slide";
-import { io } from "socket.io-client";
-import config from "../Config";
-const socket = io(config.apiUrl); // Replace with your backend URL
+import { groupChatSocket } from "../Config/socketConfig";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
 	return (
@@ -82,7 +80,7 @@ const SideBar = (props) => {
 				oldRoomId: selectedGroupDetails._id,
 				userName: userDetails.name,
 			};
-			socket.emit("JoinRoom", payload); // Join the specified room
+			groupChatSocket.emit("JoinRoom", payload); // Join the specified room
 		}
 		setSelectedGroupDetails(el);
 		let tempArray = [];
@@ -229,7 +227,7 @@ const SideBar = (props) => {
 		// console.log("Side bar mounted")
 		getAllChatGroupOfAUser(userDetails._id);
 		// console.log(" -> ", userDetails)
-		socket.on("RoomJoined", (data) => {
+		groupChatSocket.on("RoomJoined", (data) => {
 			console.log("Message from backend -> ", data);
 			// setChatMessage((prevMessages) => [...prevMessages, data]);
 			// Acknowledge message receipt by calling the callback
