@@ -6,6 +6,7 @@ import { setUserDetails, saveToken } from "../../Redux/Reducer";
 import HttpService from "../../services/HttpService";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
+import { groupChatSocket } from "../../Config/socketConfig";
 
 const useStyles = makeStyles({
 	mainContainer: {
@@ -84,6 +85,18 @@ const Login = (props) => {
 				if (isLoginPage) {
 					if (!localStorage.getItem("TOKEN_KEY")) {
 						const response = await HttpService.userLogin(formValue);
+						// As user is logging in connect to him all rooms available to him
+						response.data.user.chatGroups.forEach(el => {
+							console.log("Groups -> ", el);
+							let payload = {
+								roomName: el.groupName,
+								roomId: el._id,
+								oldRoomId: response.data.user._id,
+								userName: response.data.user.name,
+							};
+							groupChatSocket.emit("JoinRoom", payload);
+						});
+
 						dispatch(setUserDetails(response.data.user));
 						dispatch(saveToken(response.data.token));
 						if (response.data.token) {
