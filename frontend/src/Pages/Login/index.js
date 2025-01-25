@@ -7,6 +7,7 @@ import HttpService from "../../services/HttpService";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { groupChatSocket } from "../../Config/socketConfig";
+import { joinRoomService } from "../../services/WebSocket.service";
 
 const useStyles = makeStyles({
 	mainContainer: {
@@ -93,8 +94,9 @@ const Login = (props) => {
 								roomId: el._id,
 								oldRoomId: response.data.user._id,
 								userName: response.data.user.name,
+								userDetails: response.data.user,
 							};
-							groupChatSocket.emit("JoinRoom", payload);
+							joinRoomService(payload);  // Join the specified room
 						});
 
 						dispatch(setUserDetails(response.data.user));

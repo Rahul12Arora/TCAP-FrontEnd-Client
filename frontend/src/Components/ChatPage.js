@@ -40,7 +40,7 @@ const ChatPage = (props) => {
 			};
 			let room = props.ROOM_ID;
 			if (newMessage && room) {
-				console.log("Room and msg -> ", room, payload.msgBody);
+				// console.log("Room and msg -> ", room, payload.msgBody);
 				// socket.emit('JoinRoom', props.ROOM_ID); // Send room name
 				groupChatSocket.emit("message", payload);
 				// socket.emit("message", { room, payload }); // Send a message to the room
