@@ -41,6 +41,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import Slide from "@mui/material/Slide";
 import { groupChatSocket } from "../Config/socketConfig";
 import { joinRoomService } from "../services/WebSocket.service";
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
 	return (
@@ -70,6 +71,7 @@ const SideBar = (props) => {
 	const [room, setRoom] = useState("");
 	const [showGroupMembers, setShowGroupMembers] = useState(false);
 	const [chatGroupMembers, setChatGroupMembers] = useState([]);
+	const [openAddFriendDialogBox, setOpenAddFriendDialogBox] = useState(false);
 
 	// Function to handle change in the selected chat group
 	const groupNameChangeHandler = (event, el) => {
@@ -225,6 +227,42 @@ const SideBar = (props) => {
 		}
 	};
 
+	// Function open dialog to add friend
+	const addFriendHandler = async () => {
+		try {
+			console.log("Add Friend handler called -> ");
+			const response = await HttpService.getAllUser();
+			const arr = response.data.filter(
+				(user) => user.email !== userDetails.email
+			);
+			setActiveUsers(arr);
+			setOpenAddFriendDialogBox(true);
+		} catch (error) {
+			console.error("Error -> ", error);
+		}
+	};
+
+	// Function to close add new member to Chat Group dialog
+	const handleCloseAddFriendDialog = () => {
+		setOpenAddFriendDialogBox(false);
+	};
+
+	// function to create new Group
+	const addFriendAndSentFriendRequest = async (event) => {
+		try {
+			/**
+			 * !Proper functionality yet to implement
+			 * 1. To show proper snack msg 
+			 */
+			let payload = { sendFriendRequestToUser: newGroupUsers._id };
+			const response = await HttpService.sendFreindRequest(payload);
+			setOpenAddFriendDialogBox(false);
+			alert(`Friend Request Sent To: ${response.data.name}`);
+		} catch (error) {
+			console.error("Error -> ", error);
+		}
+	};
+
 	useEffect(() => {
 		// console.log("Side bar mounted")
 		getAllChatGroupOfAUser(userDetails._id);
@@ -263,6 +301,13 @@ const SideBar = (props) => {
 						<Box sx={{ display: "flex", gap: 2 }}>
 							<IconButton
 								color="inherit"
+								onClick={addFriendHandler} // Add your handler function
+								title="Add Friend"
+							>
+								<PersonAddIcon />
+							</IconButton>
+							<IconButton
+								color="inherit"
 								onClick={viewGroupMembersHandler} // Add your handler function
 								title="View Group Members"
 							>
@@ -274,7 +319,7 @@ const SideBar = (props) => {
 								onClick={addGroupMembersHandler} // Add your handler function
 								title="Add Group Members"
 							>
-								<PersonAddIcon />
+								<GroupAddIcon />
 							</IconButton>
 
 							<IconButton
@@ -313,7 +358,7 @@ const SideBar = (props) => {
 						>
 							<ListItemButton>
 								<ListItemIcon>
-									<PersonAddIcon />
+									<GroupAddIcon />
 								</ListItemIcon>
 								<ListItemText primary={"Create New Group"} />
 							</ListItemButton>
@@ -376,6 +421,7 @@ const SideBar = (props) => {
 					</Routes>
 				</Box>
 			</Box>
+			{/* Create New Chat group component */}
 			<Dialog
 				open={openNewChatGroupDialog}
 				onClose={handleCloseNewChatGroupDialog}
@@ -428,6 +474,48 @@ const SideBar = (props) => {
 				</DialogActions>
 			</Dialog>
 
+			{/* Add Friend Component */}
+			<Dialog
+				open={openAddFriendDialogBox}
+				onClose={handleCloseAddFriendDialog}
+				fullWidth={true}
+				width="sm"
+				TransitionComponent={Transition}
+			>
+				<DialogTitle>Add Friend</DialogTitle>
+				<FormControl sx={{ ml: 3, minWidth: 120 }}>
+					<Autocomplete
+						// multiple
+						onChange={(e, v) => {
+							addUsersToChatGroupHandler(e, v);
+						}}
+						id="combo-box-demo"
+						options={activeUsers}
+						getOptionLabel={(option) => option.email}
+						filterSelectedOptions
+						sx={{ width: 300 }}
+						renderInput={(params) => (
+							<TextField
+								{...params}
+								label="Select To Add Friend"
+							/>
+						)}
+					/>
+				</FormControl>
+				<DialogActions>
+					<Button onClick={handleCloseAddFriendDialog}>
+						Close
+					</Button>
+					<Button
+						type="submit"
+						onClick={addFriendAndSentFriendRequest}
+					>
+						Sent Request
+					</Button>
+				</DialogActions>
+			</Dialog>
+
+			{/* Add new group member component */}
 			<Dialog
 				open={openAddNewMemberInGroupDialog}
 				onClose={handleCloseAddNewMemberInGroupDialog}
@@ -467,6 +555,8 @@ const SideBar = (props) => {
 					</Button>
 				</DialogActions>
 			</Dialog>
+
+			{/* Show group members Component */}
 			<Drawer
 				open={showGroupMembers}
 				onClose={() => setShowGroupMembers(false)}

@@ -15,6 +15,12 @@ const HttpService = {
     userRegistration: function (data) {
         return axios.post(`${QTurl}user/register`, data);
     },
+    /**
+     * Function to add friend and send friend request
+     */
+    sendFreindRequest: function (data) {
+        return axios.post(`${QTurl}user/send-friend-request`, data);
+    },
     getAllUser: function (data) {
         return axios.get(`${QTurl}user/getAllUser`, data);
     },
